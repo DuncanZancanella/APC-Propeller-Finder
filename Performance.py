@@ -27,16 +27,6 @@ from sklearn.preprocessing import PolynomialFeatures
 
 
 """
-""" 
-INPUTS
-"""
-max_power = 600 #[W]
-# find maximum thrust for the defined max power
-
-file_path = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Perfomance Data\PERFILES2\PER3_20x10E.dat"
-
-# Specific power level to compare thrust
-target_power = 600  # Replace with your desired power level (in Watts)
 
 class Perfomance(APC_propeller): 
 
@@ -48,6 +38,8 @@ class Perfomance(APC_propeller):
         """
         Method for reading APC Performance files and saving the data.
         Returns an dataframe containing all respective data from each RPM.
+        Inputs:
+            prop = propeller name/code. Example "20x10E".
         """
         perf_DataPath = super().searchPropeller(propeller=prop, label='perf')
 
@@ -75,9 +67,10 @@ class Perfomance(APC_propeller):
 
             # Identifica a linha do cabeçalho da tabela
             elif re.match(r'\s*V\s+J\s+Pe\s+Ct', line):
-                columns = ["V (mph)", "J (Adv_Ratio)", "Pe", "Ct", "Cp", "PWR (Hp)", "Torque (In-Lbf)", 
-                        "Thrust (Lbf)", "PWR (W)", "Torque (N-m)", "Thrust (N)", "THR/PWR (g/W)", 
-                        "Mach", "Reyn", "FOM"]  # Define os nomes das colunas sem "RPM"
+                columns = ["V (mph)", "J (Adv_Ratio)", "Pe", "Ct", "Cp", 
+                           "PWR (Hp)", "Torque (In-Lbf)", "Thrust (Lbf)", 
+                           "PWR (W)", "Torque (N-m)", "Thrust (N)", 
+                           "THR/PWR (g/W)", "Mach", "Reyn", "FOM"]  # Define os nomes das colunas sem "RPM"
                 data_start = i + 2  # Pula a linha das unidades
 
             # Lê os dados numéricos após encontrar o cabeçalho
@@ -93,9 +86,9 @@ class Perfomance(APC_propeller):
             return
 
         # Criar DataFrame
-        df = pd.DataFrame(data, columns=["RPM"] + columns)
+        perf_df = pd.DataFrame(data, columns=["RPM"] + columns)
 
-        return df
+        return perf_df
 
     def find_StaticThurst_for_Power(self, dataframe, power):
         """
@@ -178,9 +171,12 @@ class Perfomance(APC_propeller):
         return a*np.power(v, 3) + b*np.power(v, 2) + c*v + d
 
     def DynamicThrust(self, propPath, Power, density):
+        """
+        NECESSARIO ATUALIZAR
+        """
         density_seaLevel = 1.225
 
-        df_performance = Perfomance.read_apc_performance_data(propPath)
+        df_performance = Perfomance.read_data(propPath, prop=None)
         df_closestPower = Perfomance.find_StaticThurst_for_Power(df_performance, Power)
 
         RPM = df_closestPower["RPM"].iloc[0]
@@ -207,6 +203,16 @@ class Perfomance(APC_propeller):
         plt.show()
 
         #print(df_interestData)
+
+    def get_perfomance(self, prop, RPM, plot=True):
+        """ 
+        Returns propeller's Figure of Merit (FoM), Ct and Cp for a given RPM (if available in database).
+        Inputs:
+            prop = propeller code
+            RPM
+            plot = True/False
+        """
+        pass
 
     def comparePropellers(self, propPath1, propPath2, Power, density):
         density_seaLevel = 1.225

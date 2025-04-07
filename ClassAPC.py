@@ -37,7 +37,7 @@ class APC_propeller():
         self.code = None
         self.directory = None
 
-    def searchPropeller(self, propeller, label, print=False):
+    def searchPropeller(self, propeller, label, display=False):
         """
         Enters the code of a certain propeller defined by "Diameter x Pitch(Type)" (in inches).
         Types of propellers:
@@ -66,19 +66,20 @@ class APC_propeller():
                 arquivos_encontrados = list(geometry_path.rglob(self.code))
 
                 if arquivos_encontrados:
-                    if print:
+                    if display:
                         print(f"Propeller '{self.code}' found in: {arquivos_encontrados[0]}")
-                    return self.propeller
+                    return arquivos_encontrados[0]
                 else:
-                    print(f"Propeller '{self.code}' not found. Verify propeller code.")
+                    if display:
+                        print(f"Propeller '{self.code}' not found. Verify propeller code.")
                     return False
 
             else:
                 self.code = propeller + "-PERF.PE0" # atualiza input
                 propeller = self.code
-                return self.searchPropeller(propeller, label) #chamada recursiva onde os inputs ja foram atualizados
+                return self.searchPropeller(propeller, label, display) #chamada recursiva onde os inputs ja foram atualizados
         
-        if label == "perf":
+        elif label == "perf":
             perf_path = Path(self.perfomance_path)
             #verifies if propeller enter code is correct
             if "PER3_" in self.code:
@@ -87,11 +88,12 @@ class APC_propeller():
                 arquivos_encontrados = list(perf_path.rglob(self.code))
 
                 if arquivos_encontrados:
-                    if print:
+                    if display:
                         print(f"Propeller '{self.code}' found in: {arquivos_encontrados[0]}")
                     return arquivos_encontrados[0]
                 else:
-                    print(f"Propeller '{self.code}' not found. Verify propeller code.")
+                    if display:
+                        print(f"Propeller '{self.code}' not found. Verify propeller code.")
                     return False
 
             else:
