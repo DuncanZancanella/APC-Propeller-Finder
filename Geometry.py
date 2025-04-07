@@ -132,7 +132,7 @@ class Geometry(APC_propeller):
 
 
         # Se não encontrou os dados, retorna erro
-        if not data_1: # generalprop_data:
+        if not data_1 or not generalprop_data:
             raise ValueError("Error in finding geometry data.")
             return
 
