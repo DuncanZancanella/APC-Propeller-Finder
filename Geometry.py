@@ -27,7 +27,7 @@ class Geometry(APC_propeller):
 
         geo_DataPath = super().searchPropeller(propeller=prop, label='geo')
 
-        if geo_DataPath is None:
+        if geo_DataPath is False:
             print("Error: geometry data path not found.")
             return
 
@@ -70,7 +70,10 @@ class Geometry(APC_propeller):
         """
         CONTINUAR AQ A PARTIR de TOTAL PROJECTED AREA (IN**2)
         """
-        columns_generalprop_data = ["RADIUS", "HUBTRA", "BLADES", "TOTAL WEIGHT (Kg)", "TOTAL VOLUME (IN**3)"]
+        columns_generalprop_data = ["RADIUS", "HUBTRA", "BLADES", "TOTAL WEIGHT (Kg)", 
+                                    "TOTAL VOLUME (IN**3)", "TOTAL PROJECTED AREA (IN**2)",
+                                    "MOMENT OF INERTIA (Kg-M**2)", "DENSITY (Kg/M**3)",
+                                    "AIRFOIL_1","AIRFOIL_1TR (IN)", "AIRFOIL_2TR (IN)", "AIRFOIL_2"]
         generalprop_data = {}
         for line in lines:
             line = line.strip()
@@ -100,9 +103,36 @@ class Geometry(APC_propeller):
                 if match:
                     generalprop_data["TOTAL VOLUME (IN**3)"] = float(match.group(1))
 
+            elif "TOTAL PROJECTED AREA (IN**2)" in line:
+                match = re.search(r'TOTAL PROJECTED AREA \(IN\*\*2\)\s*=\s*([-\d.Ee]+)', line)
+                if match:
+                    generalprop_data["TOTAL PROJECTED AREA (IN**2)"] = float(match.group(1))
+
+            elif "MOMENT OF INERTIA (Kg-M**2)" in line:
+                match = re.search(r'MOMENT OF INERTIA \(Kg-M\*\*2\)\s*=\s*([-\d.Ee]+)', line)
+                if match:
+                    generalprop_data["MOMENT OF INERTIA (Kg-M**2))"] = float(match.group(1))
+
+            elif "DENSITY (SPECIFIC GRAVITY, INPUT FILE)" in line:
+                match = re.search(r'DENSITY \(SPECIFIC GRAVITY, INPUT FILE\)\s*=\s*([-\d.Ee]+)', line)
+                if match:
+                    generalprop_data["DENSITY (Kg/M**3)"] = float(match.group(1))
+
+            elif "AIRFOIL1:" in line:
+                match = re.search(r'AIRFOIL1:\s*([-\d.]+),\s*([A-Za-z0-9\-_.]+)', line)
+                if match:
+                    generalprop_data["AIRFOIL_1TR (IN)"] = float(match.group(1)) #Airfoil 1 transition start start station
+                    generalprop_data["AIRFOIL_1"] = match.group(2)
+
+            elif "AIRFOIL2:" in line:
+                match = re.search(r'AIRFOIL2:\s*([-\d.]+),\s*([A-Za-z0-9\-_.]+)', line)
+                if match:
+                    generalprop_data["AIRFOIL_2TR (IN)"] = float(match.group(1)) #Airfoil 2 transition start end station
+                    generalprop_data["AIRFOIL_2"] = match.group(2)
+
 
         # Se não encontrou os dados, retorna erro
-        if not data_1:
+        if not data_1: # generalprop_data:
             raise ValueError("Error in finding geometry data.")
             return
 
@@ -110,10 +140,13 @@ class Geometry(APC_propeller):
         geo_df = pd.DataFrame(data_1, columns=columns_data1)
         geo_generaldf = pd.DataFrame([generalprop_data])
 
-        return geo_generaldf
+        return geo_df, geo_generaldf
 
 # Teste
 
 prop = Geometry()
-df = prop.read_data("20x10E")
-print(df)
+df, df2 = prop.read_data("20x10E")
+#print(prop.searchPropeller("21x12E", label="geo", display=True))
+print(df2)
+
+# TESTAR hélices indisponíveis "21x12E"
