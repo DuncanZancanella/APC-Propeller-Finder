@@ -72,8 +72,9 @@ class Geometry(APC_propeller):
         """
         columns_generalprop_data = ["RADIUS", "HUBTRA", "BLADES", "TOTAL WEIGHT (Kg)", 
                                     "TOTAL VOLUME (IN**3)", "TOTAL PROJECTED AREA (IN**2)",
-                                    "MOMENT OF INERTIA (Kg-M**2)", "DENSITY (Kg/M**3)",
-                                    "AIRFOIL_1","AIRFOIL_1TR (IN)", "AIRFOIL_2TR (IN)", "AIRFOIL_2"]
+                                    "MOMENT OF INERTIA (Kg-M**2)",
+                                    "AIRFOIL_1","AIRFOIL_1TR (IN)", 
+                                    "AIRFOIL_2TR (IN)", "AIRFOIL_2"]
         generalprop_data = {}
         for line in lines:
             line = line.strip()
@@ -113,11 +114,6 @@ class Geometry(APC_propeller):
                 if match:
                     generalprop_data["MOMENT OF INERTIA (Kg-M**2))"] = float(match.group(1))
 
-            elif "DENSITY (SPECIFIC GRAVITY, INPUT FILE)" in line:
-                match = re.search(r'DENSITY \(SPECIFIC GRAVITY, INPUT FILE\)\s*=\s*([-\d.Ee]+)', line)
-                if match:
-                    generalprop_data["DENSITY (Kg/M**3)"] = float(match.group(1))
-
             elif "AIRFOIL1:" in line:
                 match = re.search(r'AIRFOIL1:\s*([-\d.]+),\s*([A-Za-z0-9\-_.]+)', line)
                 if match:
@@ -147,6 +143,6 @@ class Geometry(APC_propeller):
 prop = Geometry()
 df, df2 = prop.read_data("20x10E")
 #print(prop.searchPropeller("21x12E", label="geo", display=True))
-print(df2)
+print(df)
 
 # TESTAR hélices indisponíveis "21x12E"
