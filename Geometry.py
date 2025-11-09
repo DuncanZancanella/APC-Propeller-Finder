@@ -6,11 +6,6 @@ import re
 import os
 from ClassAPC import *
 
-
-"""
-Incluir classe para ler a geometria a partir do arquivo e fazer a regressão
-"""
-
 class Geometry(APC_propeller):
 
     def __init__(self):
@@ -23,13 +18,15 @@ class Geometry(APC_propeller):
 
         Inputs:
             prop = propeller name/code. Example "20x10E".
+        Outputs:
+            dataframe containing all data in file, except:  MOMENT OF INERTIA (SNAIL-IN**2),
+                 STATIC MOMENT, ONE SIDE (IN-LB),  SANITY CHECK DATA and NATURAL FREQUENCY DATA
         """
 
         geo_DataPath = super().searchPropeller(propeller=prop, label='geo')
 
         if geo_DataPath is False:
-            print("Error: geometry data path not found.")
-            return
+            raise ValueError("Error: geometry data path not found.")
 
         with open(geo_DataPath, 'r') as file:
             lines = file.readlines()
@@ -67,9 +64,6 @@ class Geometry(APC_propeller):
         # ---------
         # Read specific data
         # ---------
-        """
-        CONTINUAR AQ A PARTIR de TOTAL PROJECTED AREA (IN**2)
-        """
         columns_generalprop_data = ["RADIUS", "HUBTRA", "BLADES", "TOTAL WEIGHT (Kg)", 
                                     "TOTAL VOLUME (IN**3)", "TOTAL PROJECTED AREA (IN**2)",
                                     "MOMENT OF INERTIA (Kg-M**2)",
@@ -112,7 +106,7 @@ class Geometry(APC_propeller):
             elif "MOMENT OF INERTIA (Kg-M**2)" in line:
                 match = re.search(r'MOMENT OF INERTIA \(Kg-M\*\*2\)\s*=\s*([-\d.Ee]+)', line)
                 if match:
-                    generalprop_data["MOMENT OF INERTIA (Kg-M**2))"] = float(match.group(1))
+                    generalprop_data["MOMENT OF INERTIA (Kg-M**2)"] = float(match.group(1))
 
             elif "AIRFOIL1:" in line:
                 match = re.search(r'AIRFOIL1:\s*([-\d.]+),\s*([A-Za-z0-9\-_.]+)', line)
@@ -130,7 +124,6 @@ class Geometry(APC_propeller):
         # Se não encontrou os dados, retorna erro
         if not data_1 or not generalprop_data:
             raise ValueError("Error in finding geometry data.")
-            return
 
         # Criar DataFrame
         geo_df = pd.DataFrame(data_1, columns=columns_data1)
@@ -141,8 +134,9 @@ class Geometry(APC_propeller):
 # Teste
 
 prop = Geometry()
-df, df2 = prop.read_data("20x10E")
+df, df2 = prop.read_data("10x55MR")
 #print(prop.searchPropeller("21x12E", label="geo", display=True))
 print(df)
-
+print(df2)
+df2.to_csv('text.txt', index=False)
 # TESTAR hélices indisponíveis "21x12E"

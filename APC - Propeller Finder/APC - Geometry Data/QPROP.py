@@ -1,12 +1,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from pathlib import Path
-#import aeropy
 import pandas as pd
 
 """
-Class QPROP is used to read qprop outputs and generate useful graphs for the team
-P vs V vs eta, RPM, 
+Class QPROP is used to read qprop outputs and data analysis
+P vs V vs eta, RPM, ...
 
 Para implementar:
     1) P vs RPM
@@ -124,9 +123,9 @@ class QPROP():
 
 
 
-qpropData_path = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Geometry Data\qprop20x10E.txt"
+qpropData_path = r"C:\Users\dunca\Desktop\UFSC\APC - Propeller data\APC - Propeller Finder\APC - Geometry Data\qprop20x10E.txt"
 prop = QPROP(qpropData_path)
 prop.DynamicThrust()
 prop.PropellerCoefficients(200000, 1250)
-#prop.PowerAnalysis()
+prop.PowerAnalysis()
 prop.PowerThurst()

@@ -1,19 +1,13 @@
 
-#import aeropy.aerodynamics
-#import aeropy.airfoils
-#import aeropy.airfoils.analysis
-#import aeropy.airfoils.shapes
 import numpy as np
 from matplotlib import pyplot as plt
 from pathlib import Path
-#import aeropy
 import pandas as pd
 
+from abc import ABC, abstractmethod
+
 """ --- Summary of methods 
-    1) searchPropeller: verifica se a dada hélice está presente no caminho dado
-    2) readAPC_file: pega as 13 colunas principais  STATION, CHORD, PITCH (QUOTED), PITCH (LE-TE), PITCH (PRATHER), SWEEP, THICKNESS, TWIST, MAX-THICK, CROSS-SECTION ZHIGH, CGY, CGZ    
-    3) getChord ---> generalizar funções 3 e 4 para 2
-    4) getTwist
+    1) searchPropeller: verifica se a dada hélice está presente no caminho dado. Retorna o diretório do arquivo.
 
     A implementar:
         1) metodo para desligar print (**kwargs print=Boolean)
@@ -37,7 +31,7 @@ class APC_propeller():
         self.code = None
         self.directory = None
 
-    def searchPropeller(self, propeller, label, display=False):
+    def searchPropeller(self, propeller, label, verbose=False):
         """
         Enters the code of a certain propeller defined by "Diameter x Pitch(Type)" (in inches).
         Types of propellers:
@@ -54,6 +48,8 @@ class APC_propeller():
         Inputs:
             propeller = prop code/name. Example "20x10E", "9x10".
             label = "geo" for searching in geometry data, "perf for perfomance data
+        Output:
+            Propeller file directory.
         """
         self.code = str(propeller)
 
@@ -66,18 +62,16 @@ class APC_propeller():
                 arquivos_encontrados = list(geometry_path.rglob(self.code))
 
                 if arquivos_encontrados:
-                    if display:
+                    if verbose:
                         print(f"Propeller '{self.code}' found in: {arquivos_encontrados[0]}")
                     return arquivos_encontrados[0]
                 else:
-                    if display:
-                        print(f"Propeller '{self.code}' not found. Verify propeller code.")
-                    return False
+                    raise ValueError(f"Propeller '{self.code}' not found. Verify propeller code.")
 
             else:
                 self.code = propeller + "-PERF.PE0" # atualiza input
                 propeller = self.code
-                return self.searchPropeller(propeller, label, display) #chamada recursiva onde os inputs ja foram atualizados
+                return self.searchPropeller(propeller, label, verbose) #chamada recursiva onde os inputs ja foram atualizados
         
         elif label == "perf":
             perf_path = Path(self.perfomance_path)
@@ -88,141 +82,30 @@ class APC_propeller():
                 arquivos_encontrados = list(perf_path.rglob(self.code))
 
                 if arquivos_encontrados:
-                    if display:
+                    if verbose:
                         print(f"Propeller '{self.code}' found in: {arquivos_encontrados[0]}")
                     return arquivos_encontrados[0]
                 else:
-                    if display:
-                        print(f"Propeller '{self.code}' not found. Verify propeller code.")
-                    return False
+                    raise ValueError(f"Propeller '{self.code}' not found. Verify propeller code.")
 
             else:
                 self.code = "PER3_" + propeller + ".dat" # atualiza input
                 propeller = self.code
                 return self.searchPropeller(propeller, label) #chamada recursiva onde os inputs ja foram atualizados
         else:
-            print(f"Invalid label. Verify if it refers to \'geo' or \'perf'." )
+            raise ValueError(f"Invalid label. Verify if it refers to \'geo' or \'perf'." )
 
+    @abstractmethod
+    def read_data(self):
+        """ Must be implemented by the subclass. """
+        pass
 
-    def readAPC_file(self):
-        self.code = self.searchPropeller()
-        caminho = self.directory + "\\" + self.code
-
-        with open(caminho, 'r') as f:
-            linhas = f.readlines()
-        
-        dados_tabulares = []
-        
-        for linha in linhas:
-            try:
-                # Tentamos converter a linha para float
-                # Se a linha tiver números, ela será dividida e armazenada
-                valores = list(map(float, linha.split()))
-                # Só adicionamos a linha se ela contém 13 colunas (padrão de colunas do exemplo)
-                if len(valores) == 13:
-                    dados_tabulares.append(valores)
-            except ValueError:
-                # Ignora a linha se não puder ser convertida para números (ou seja, não é dado tabular)
-                continue
-        
-        # Converte a lista de listas para um array numpy
-        return np.array(dados_tabulares)
-    
-    def getChord(self):
-        geometry_data = self.readAPC_file()
-        r = geometry_data[:,0]
-        R = max(r)
-
-        plt.xlabel("r/R")
-        plt.ylabel("c/R")
-
-        plt.title(f"APC Propeller: {self.name}")
-        chord_distribution = geometry_data[:,1]
-        plt.plot(r/R, chord_distribution/R, "o", color="black")
-        plt.grid(True)
-        plt.show()
-
-        return r, chord_distribution
-    
-    def getTwist(self):
-        geometry_data = self.readAPC_file()
-        r = geometry_data[:,0]
-        R = max(r)
-        plt.xlabel("r/R")
-        plt.ylabel("Degrees")
-        plt.title(f"APC Propeller: {self.name}")
-
-        twist_distribution = geometry_data[:,7]
-        plt.plot(r/R, twist_distribution, "o", color="black")
-        plt.grid(True)
-        plt.show()
-
-        return r, twist_distribution
-    
-    
-    def getThickness(self):
-        geometry_data = self.readAPC_file()
-        r = geometry_data[:,0]
-        R = max(r)
-        plt.xlabel("r/R")
-        plt.ylabel("Thickness distribution [in]")
-        plt.title(f"APC Propeller: {self.name}")
-
-        thickness_distribution = geometry_data[:,8]
-        plt.plot(r/R, thickness_distribution, "o", color="black")
-        plt.grid(True)
-        plt.show()
-
-        return r, thickness_distribution #[IN]
-
-    def plotPropeller(self):
-        geometry_data = self.readAPC_file()
-        r = geometry_data[:,0]
-        R = max(r)
-
-    def getData(self): ##FUNÇÃO INCORRETA: alterar para ler até determinada parte do arquivo, e não tudo
-        """
-        USADO PARA GEOMETRY DATA
-        """
-        self.code = self.searchPropeller()
-        caminho = self.directory + "\\" + self.code
-
-        with open(caminho, "r") as f:
-            linhas = f.readlines()
-
-        # Identificar a linha onde começam os dados numéricos
-        for i, linha in enumerate(linhas):
-            if linha.strip().startswith("STATION"):
-                linha_inicial = i + 1  # A linha seguinte contém os dados
-                break
-
-        # Nomes das colunas conforme a estrutura do arquivo
-        colunas = [
-            "STATION (IN)", "CHORD (IN)", "PITCH (QUOTED)", "PITCH (LE-TE)", "PITCH (PRATHER)",
-            "SWEEP (IN)", "THICKNESS RATIO", "TWIST (DEG)", "MAX-THICK (IN)",
-            "CROSS-SECTION (IN**2)", "ZHIGH (IN)", "CGY (IN)", "CGZ (IN)"
-        ]
-
-        # Ler os dados usando pandas
-        df = pd.read_csv(
-            caminho, 
-            skiprows=linha_inicial,  # Pula as linhas antes da tabela de dados
-            delim_whitespace=True,  # Usa espaços como delimitadores
-            names=colunas  # Define os nomes das colunas manualmente
-        )
-
-        # Exibir as primeiras linhas do DataFrame
-        return df
-    
     def QPROP_outputfile(self):
-        r, chord = self.getChord()
-        r, beta = self.getTwist()
-
-        dados = np.column_stack((r, chord, beta))
-        np.savetxt(f"APC{self.code}.txt", dados, fmt="%.3f", delimiter="    ", header="#r \t chord \t twist", comments='')
-        return True
+        pass
 
 
 
 prop = APC_propeller()
-geo_data = prop.searchPropeller(propeller="20x10E", label="perf")
+geo_data = prop.searchPropeller(propeller="10x45MR", label="perf")
+
+print(geo_data)

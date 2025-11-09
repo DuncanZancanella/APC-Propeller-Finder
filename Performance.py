@@ -16,7 +16,7 @@ from sklearn.preprocessing import PolynomialFeatures
 """ --- METHODS ---
         1) read_apc_perfomance_data: le cada rpm e salva num dataframe
         2) find_StaticThurst_for_Power
-        3) findPropeller(perfomancePath, Power, number)
+        3) findProp_power(perfomancePath, Power, number)
             perfomancePath = folder that contains APC perfomance data ".dat" archives
             Power [W]
             number = number of closest propellers to Power
@@ -33,7 +33,6 @@ class Perfomance(APC_propeller):
     def __init__(self):
         super().__init__()
 
-
     def read_data(self, prop):
         """
         Method for reading APC Performance files and saving the data.
@@ -44,8 +43,7 @@ class Perfomance(APC_propeller):
         perf_DataPath = super().searchPropeller(propeller=prop, label='perf')
 
         if perf_DataPath is None:
-            print("Error: perfomance data path not found.")
-            return
+            raise ValueError("Error: perfomance data path not found.")
 
         with open(perf_DataPath, 'r') as file:
             lines = file.readlines()
@@ -83,7 +81,6 @@ class Perfomance(APC_propeller):
         # Se não encontrou os dados, retorna erro
         if not data:
             raise ValueError("Error in finding data.")
-            return
 
         # Criar DataFrame
         perf_df = pd.DataFrame(data, columns=["RPM"] + columns)
@@ -102,8 +99,6 @@ class Perfomance(APC_propeller):
         #filtra qual é a que tem maior tração estática
         #df_filtrado = df_filtrado.loc[df_filtrado["Thrust (N)"].idxmax()]
 
-
-
         # Se não houver valores na faixa, retornar None
         if df_filtrado.empty:
             return None  
@@ -113,7 +108,7 @@ class Perfomance(APC_propeller):
         
         return df_filtrado
 
-    def findPropeller(self, Power, number, type=None):
+    def findProp_power(self, Power, number, type=None):
         """
         Finds the propellers, closest to the power given, that have the biggest static thrust.
         Inputs:
@@ -245,30 +240,10 @@ class Perfomance(APC_propeller):
 
 
 
-
-# Caminho do arquivo
-#filename = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Perfomance Data\PERFILES2\PER3_20x10E.dat"
-
-#perf = Perfomance()
-# Ler os dados
-#df_performance = perf.read_apc_performance_data()
-#df_filtrado = perf.find_StaticThurst_for_Power(df_performance, 600)
-#print(df_filtrado.iloc[0].T)
-
-# maiores trações estáticas 
-#pasta = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Perfomance Data\PERFILES2"
-#perf.findPropeller(pasta, 600, 20)
-
-#prop21x13E = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Perfomance Data\PERFILES2\PER3_21x13E.dat"
-#perf.DynamicThrust(prop21x13E, 600, 1.084)
-
-#prop20x10E = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Perfomance Data\PERFILES2\PER3_20x10E.dat"
-
-#prop22x10E = r"C:\Users\dunca\Desktop\APC - Propeller data\APC - Geometry Data-20250226T185701Z-001\APC - Perfomance Data\PERFILES2\PER3_22x10E.dat"
-#perf.comparePropellers(prop21x13E, prop22x10E, 600, 1.084)
-
 prop = Perfomance()
 df = prop.read_data("20x10E")
+df.to_excel('perftest.xlsx')
+print(df)
+#prop.findProp_power(Power=600, number=10, type="E")
 
-prop.findPropeller(Power=600, number=10, type="E")
 
