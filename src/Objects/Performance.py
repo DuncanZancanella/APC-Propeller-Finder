@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import re
 import os
-from src.ClassAPC import *
+from Objects.ClassAPC import *
 
 #from sklearn.linear_model import LinearRegression
 #from sklearn.preprocessing import PolynomialFeatures

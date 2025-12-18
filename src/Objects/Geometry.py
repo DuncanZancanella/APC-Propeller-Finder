@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import re
-from src.ClassAPC import *
+from Objects.ClassAPC import *
 
 class Geometry(APC_propeller):
 

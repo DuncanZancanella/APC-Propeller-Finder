@@ -5,7 +5,7 @@ Simple library for searching APC propeller geometry and performance data.
 ## Functionalities 
 - read geometry and performance data from APC propellers and save in a pandas dataframe
 
-## Instalation with Poetry 
+## Installation with Poetry 
 
 1. Clone the repository:
    ```bash
@@ -29,4 +29,4 @@ Simple library for searching APC propeller geometry and performance data.
 - APC Propellers data: https://www.apcprop.com/technical-information/file-downloads
 
 ## Usage
-- Follow Jupyter Notebook example for propeller search
+- Follow Jupyter Notebook tutorial for propeller search

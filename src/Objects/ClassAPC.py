@@ -20,8 +20,20 @@ class APC_propeller():
     
     # construtor
     def __init__(self):
-        self.geometry_path = r"C:APC - Propeller Finder\APC - Geometry Data\PE0-FILES_WEB"
-        self.perfomance_path = r"C:APC - Propeller Finder\APC - Perfomance Data\PERFILES2"
+        BASE_DIR = Path(__file__).resolve().parents[2]
+
+        self.geometry_path = (
+            BASE_DIR
+            / "APC - Propeller Finder"
+            / "APC - Geometry Data"
+            / "PE0-FILES_WEB"
+        )
+        self.perfomance_path = (
+            BASE_DIR
+            / "APC - Propeller Finder"
+            / "APC - Perfomance Data"
+            / "PERFILES2"
+        )
         self.propeller = None # Propeller name
         self.code = None
         self.directory = None
