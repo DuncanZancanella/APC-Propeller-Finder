@@ -1,9 +1,5 @@
 
-import numpy as np
-from matplotlib import pyplot as plt
 from pathlib import Path
-import pandas as pd
-
 from abc import ABC, abstractmethod
 
 """ --- Summary of methods 
@@ -14,7 +10,6 @@ from abc import ABC, abstractmethod
         2) poder ter ponto no codigo da helice. ex: 18x4.5
         3) executar Xfoil e Qprop para obter Ct e Cq (criacao de uma classe generica propeller e subclasse APC) 
 
-
 """
 
 class APC_propeller():
@@ -23,10 +18,10 @@ class APC_propeller():
     Implements methods for searching propellers.
     """
     
-    #construtor
+    # construtor
     def __init__(self):
-        self.geometry_path = r"C:\Users\dunca\Desktop\UFSC\APC - Propeller data\APC - Propeller Finder\APC - Geometry Data\PE0-FILES_WEB"
-        self.perfomance_path = r"C:\Users\dunca\Desktop\UFSC\APC - Propeller data\APC - Propeller Finder\APC - Perfomance Data\PERFILES2"
+        self.geometry_path = r"C:APC - Propeller Finder\APC - Geometry Data\PE0-FILES_WEB"
+        self.perfomance_path = r"C:APC - Propeller Finder\APC - Perfomance Data\PERFILES2"
         self.propeller = None # Propeller name
         self.code = None
         self.directory = None
@@ -34,6 +29,13 @@ class APC_propeller():
     def searchPropeller(self, propeller, label, verbose=False):
         """
         Enters the code of a certain propeller defined by "Diameter x Pitch(Type)" (in inches).
+
+        Inputs:
+            propeller = prop code/name. Example "20x10E", "9x10".
+            label = "geo" for searching in geometry data, "perf for perfomance data
+        Output:
+            Propeller file directory.
+
         Types of propellers:
             E = Eletric
             EP = Eletric Pusher
@@ -45,11 +47,7 @@ class APC_propeller():
             N = Narrow
             MR = Multi Rotor
             W = Wide
-        Inputs:
-            propeller = prop code/name. Example "20x10E", "9x10".
-            label = "geo" for searching in geometry data, "perf for perfomance data
-        Output:
-            Propeller file directory.
+
         """
         self.code = str(propeller)
 
@@ -100,12 +98,3 @@ class APC_propeller():
         """ Must be implemented by the subclass. """
         pass
 
-    def QPROP_outputfile(self):
-        pass
-
-
-
-prop = APC_propeller()
-geo_data = prop.searchPropeller(propeller="10x45MR", label="perf")
-
-print(geo_data)

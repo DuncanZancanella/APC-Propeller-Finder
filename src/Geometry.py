@@ -1,10 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from pathlib import Path
 import pandas as pd
 import re
-import os
-from ClassAPC import *
+from src.ClassAPC import *
 
 class Geometry(APC_propeller):
 
@@ -131,15 +129,4 @@ class Geometry(APC_propeller):
 
         return geo_df, geo_generaldf
 
-# Teste
-"""
-prop = Geometry()
-df, df2 = prop.read_data("5x45E")
-#print(prop.searchPropeller("21x12E", label="geo", display=True))
-#print(df)
-
-df = df['STATION (IN)']/2.5
-df = df['CHORD (IN)']/2.5
-print(df)
-#print(df2)"""
 
