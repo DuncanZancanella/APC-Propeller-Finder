@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "apc-propeller-finder"
+version = "0.1.0"
+description = ""
+authors = ["DuncanZancanella <duncanbressanz@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+numpy = "^2.3.5"
+matplotlib = "^3.10.8"
+pandas = "^2.3.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

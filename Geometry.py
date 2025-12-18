@@ -132,11 +132,14 @@ class Geometry(APC_propeller):
         return geo_df, geo_generaldf
 
 # Teste
-
+"""
 prop = Geometry()
-df, df2 = prop.read_data("10x55MR")
+df, df2 = prop.read_data("5x45E")
 #print(prop.searchPropeller("21x12E", label="geo", display=True))
+#print(df)
+
+df = df['STATION (IN)']/2.5
+df = df['CHORD (IN)']/2.5
 print(df)
-print(df2)
-df2.to_csv('text.txt', index=False)
-# TESTAR hélices indisponíveis "21x12E"
+#print(df2)"""
+
