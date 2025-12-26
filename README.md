@@ -3,7 +3,8 @@
 Simple library for searching APC propeller geometry and performance data.
 
 ## Functionalities 
-- read geometry and performance data from APC propellers and save in a pandas dataframe
+- Read geometry and performance data from APC propellers and save in a pandas dataframe
+- Search propellers by performance constraints
 
 ## Installation with Poetry 
 
